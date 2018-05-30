@@ -18,48 +18,45 @@ def estructura_circuito(m,n, programacionPuertas, inputs):
 
 def resultado_circuito_capas (vector_entrada1, vector_entrada2, circuito, i, n):
     vector_salida = []
-    contador_entrada = 0;
     
     
     if(i == 0):
         for j in range(n):
             puerta = circuito[i][j][0]
+            conexiones_iniciales = circuito[i][j][1]
             if(puerta == 'AND'):
-                if(vector_entrada2[contador_entrada] + vector_entrada2[contador_entrada + 1] == 2):
+                if(vector_entrada2[conexiones_iniciales[0]] + vector_entrada2[conexiones_iniciales[1]] == 2):
                     vector_salida.append(1)
                 else:
                     vector_salida.append(0)
-                    contador_entrada += 2
-           
+                    
                 
             if(puerta == 'OR'):
-                if(vector_entrada2[contador_entrada] + vector_entrada2[contador_entrada + 1] >= 1):
+                if(vector_entrada2[conexiones_iniciales[0]] + vector_entrada2[conexiones_iniciales[1]] >= 1):
                     vector_salida.append(1)
                 else:
                     vector_salida.append(0)
-                    contador_entrada += 2
-              
+                  
             if(puerta == 'NOT'):
-                if(vector_entrada2[contador_entrada] == 0):
+                if(vector_entrada2[conexiones_iniciales[0]] == 0):
                     vector_salida.append(1)
                 else:
                     vector_salida.append(0)
-                    contador_entrada += 1
-              
+                  
             if(puerta == 'NAND'):
-                if(vector_entrada2[contador_entrada] + vector_entrada2[contador_entrada + 1] == 2):
+                if(vector_entrada2[conexiones_iniciales[0]] + vector_entrada2[conexiones_iniciales[1]] == 2):
                     vector_salida.append(0)
                 else:
                     vector_salida.append(1)
-                contador_entrada += 2 
-              
-            if(puerta == 'XOR'):
-                if(vector_entrada2[contador_entrada] + vector_entrada2[contador_entrada + 1] == 1):
-                    vector_salida.append(0)
-                else:
-                    vector_salida.append(1)
-                contador_entrada += 2
                 
+            if(puerta == 'XOR'):
+                if(vector_entrada2[conexiones_iniciales[0]] + vector_entrada2[conexiones_iniciales[1]] == 1):
+                    vector_salida.append(1)
+                else:
+                    vector_salida.append(0)
+               
+            if(puerta == '--'):
+                    vector_salida.append(0)     
     if(i > 0):
         for j in range(n):
             puerta = circuito[i][j][0]
@@ -106,7 +103,7 @@ def resultado_circuito_capas (vector_entrada1, vector_entrada2, circuito, i, n):
                     vector_salida.append(1)
                 else:
                     vector_salida.append(0)
-                    contador_entrada += 1
+                    
                     
               
             if(puerta == 'NAND'):
@@ -123,7 +120,7 @@ def resultado_circuito_capas (vector_entrada1, vector_entrada2, circuito, i, n):
                     vector_salida.append(0)
                 else:
                     vector_salida.append(1)
-                contador_entrada += 2 
+              
               
             if(puerta == 'XOR'):
                 if(conexiones[0][0] == i-2):
@@ -136,10 +133,12 @@ def resultado_circuito_capas (vector_entrada1, vector_entrada2, circuito, i, n):
                     valor2 = vector_entrada2[conexiones[1][1]]
                 
                 if(valor1 + valor2 == 1):
-                    vector_salida.append(0)
-                else:
                     vector_salida.append(1)
-                contador_entrada += 2
+                else:
+                    vector_salida.append(0)
+            
+            if(puerta == '--'):
+                    vector_salida.append(0)     
               
              
     return vector_salida;
@@ -153,26 +152,49 @@ def resultado_circuito (vector_entrada1, vector_entrada2, circuito, m, n):
     return vector_entrada2
 
 
+def resultado_circuito_defectuoso (vector_entrada1, vector_entrada2, puertas_defectuosas, circuito, m, n):
+    vector_salida = []
+    for i in range(len(puertas_defectuosas)):
+        circuito[puertas_defectuosas[i][0]][puertas_defectuosas[i][1]][0] = '--'
+        
+    for i in range(m):
+       vector_salida = resultado_circuito_capas (vector_entrada1, vector_entrada2, circuito, i, n)
+       vector_entrada1 = vector_entrada2
+       vector_entrada2 = vector_salida
+    return vector_entrada2
 
 print('Estructura de datos para la definición de un circuito')
 
-programacionPuertas = ['NOT', 'OR', 'NOT', 'NAND', 'XOR', 'AND']
-conexiones = [[], 
+programacionPuertas = ['AND', 'OR', '--', 'NOT', '--', 'NAND', '--', 'XOR', 'AND']
+conexiones = [[0,1], 
+          [1,2],
           [],
           [[0,0]],
+          [],
           [[0,0], [0,1]],
+          [],
           [[0,0], [1,0]],
-          [[0,0], [1,1]]]
+          [[1,0], [1,2]]]
 
 
 m = 3
-n = 2
+n = 3
 
 circuito = estructura_circuito(m,n, programacionPuertas, conexiones)
 
 vector_entrada1 = [0,0,0]
-vector_entrada2 = [0,0,0]
+vector_entrada2 = [0,0,1]
+puertas_defectuosas = [[0,1],
+                       [1,2]]
 
 vector_salida = resultado_circuito (vector_entrada1, vector_entrada2, circuito, m, n)
+vector_salida_defectuoso = resultado_circuito_defectuoso(vector_entrada1, vector_entrada2, puertas_defectuosas, circuito, m, n)
+
+
+
+
+print("Vector de salida: ")
 print(vector_salida)
+print("Vector de salida defectuoso: ")
+print(vector_salida_defectuoso)
 
