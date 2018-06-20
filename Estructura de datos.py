@@ -252,19 +252,34 @@ def calcula_vectores_entrada(vectores_entrada,n):
     return vectores_entrada_nuevo
 
 
-def auto_diagnostico(vect_ent):
+def calcula_vectores_salida_defectuosos(vectores_entrada):
+    vectores_salida_defec=[]
+
+    for i in range(len(vectores_entrada)):
+        vectores_salida_defec.append(resultado_circuito_defectuoso(vector_entrada1, vectores_entrada[i], puertas_defectuosas,circuito,m,n))
+    return vectores_salida_defec
+
+
+
+def auto_diagnostico(vect_ent,vectores_entrada_inicial,vector_entrada1, circuito, puertas_defectuosas,m,n):
     res= True
     vectores_e=calcula_vectores_entrada(vectores_entrada_inicial,n)#Vectores entrada
+
+    #Calculo el vector de salida defectuoso del vector de entrada que le pasamos por parametro
+    #vector_sal_def= resultado_circuito_defectuoso(vector_entrada1,vect_ent,puertas_defectuosas,circuito,m,n)
     vectores_s= f_vectores_salida(vectores_entrada_inicial,vector_entrada1,circuito,m,n)#Vectores salida
+
+    #Compruebo que el vector de salida defectuoso coincide con el vector de salida correcto
+
 
     for i in range(len(vectores_e)):
         for j in range(len(vectores_e[i])):
             if(vectores_e[i][j]==vect_ent[j]):
-                vect_sal_aux= resultado_circuito(vector_entrada1,vect_ent,circuito,m,n)
+                vect_sal_aux_def= resultado_circuito_defectuoso(vector_entrada1,vect_ent,circuito,puertas_defectuosas,m,n)
 
                 for z in range(len(vectores_s)):
                     for x in range(len(vectores_s[z])):
-                        if(vectores_s[z][x] != vect_sal_aux[x]):
+                        if(vectores_s[z][x] != vect_sal_aux_def[x]):
                             res=False
                             break
                         break
@@ -276,6 +291,7 @@ def auto_diagnostico(vect_ent):
 
 print(calcula_vectores_entrada(vectores_entrada_inicial,n))
 print(f_vectores_salida(vectores_entrada_inicial,vector_entrada1,circuito,m,n))
-print(auto_diagnostico([1,1,0]))
+print(calcula_vectores_salida_defectuosos(vectores_entrada_inicial))
+print(auto_diagnostico([0,0,0], vectores_entrada_inicial,vector_entrada1,circuito,puertas_defectuosas,m,n))
 
 
